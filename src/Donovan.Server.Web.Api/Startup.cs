@@ -3,11 +3,10 @@ using Microsoft;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Donovan;
 using Donovan.Server;
 using Donovan.Server.Repositories;
@@ -31,7 +30,7 @@ namespace Donovan.Server.Web.Api
         public void ConfigureServices(IServiceCollection services)
         {
             // Register framework services.
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllers();
 
             // Register application services.
             services.AddTransient<IManagerRepository, ManagerRepository>();
@@ -44,19 +43,17 @@ namespace Donovan.Server.Web.Api
         /// <summary>
         /// Configures the HTTP request pipeline. The runtime calls this method.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseHsts();
-            }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }
