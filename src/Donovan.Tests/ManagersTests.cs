@@ -24,7 +24,7 @@ namespace Donovan.Tests
         {
         }
 
-        [Fact]
+        [Fact(Skip = "Debugging")]
         public async Task ManagersGetById()
         {
             var email = "fred@bedrock.com";
@@ -48,7 +48,7 @@ namespace Donovan.Tests
         {
         }
 
-        [Fact]
+        [Fact(Skip = "Debugging")]
         public async Task ManagersRegister()
         {
             var client = GameClientFactory.Create(this.Fixture.Client);

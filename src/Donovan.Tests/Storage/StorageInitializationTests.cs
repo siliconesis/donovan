@@ -56,8 +56,12 @@ namespace Donovan.Tests.Storage
             // Insert rows (cannot batch insert due to varying partition keys).
             foreach (var entity in entities)
             {
+                Console.WriteLine($"Inserting {entity.Name}...");
+
                 var operation = TableOperation.Insert(entity);
                 var result = await table.ExecuteAsync(operation);
+
+                Console.WriteLine($"Status: {result.HttpStatusCode}");
 
                 Assert.Equal(204, result.HttpStatusCode);
             }
