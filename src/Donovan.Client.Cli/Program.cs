@@ -7,7 +7,7 @@ using Donovan.Client.Cli.Commands;
 namespace Donovan.Client.Cli
 {
     [Command(Name = "donovan", Description = "Interact with the Donovan soccer simulation.")]
-    [Subcommand("register", typeof(RegisterCommand))]
+    [Subcommand(typeof(RegisterCommand))]
     [VersionOptionFromMember(Description = "Displays the application version", MemberName = nameof(GetVersion))]
     public class Program
     {

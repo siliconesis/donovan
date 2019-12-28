@@ -5,7 +5,7 @@ using McMaster.Extensions.CommandLineUtils;
 
 namespace Donovan.Client.Cli.Commands
 {
-    [Command(Description = "Register a new manager")]
+    [Command(Name = "register", Description = "Register a new manager")]
     internal class RegisterCommand : CommandBase
     {
         [Required]
