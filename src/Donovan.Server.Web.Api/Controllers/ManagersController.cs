@@ -11,6 +11,7 @@ using Donovan.Server.Services;
 
 namespace Donovan.Server.Web.Api.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     public class ManagersController : ControllerBase
     {

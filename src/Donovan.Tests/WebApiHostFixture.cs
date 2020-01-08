@@ -11,11 +11,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace Donovan.Tests
 {
     public class WebApiHostFixture : IDisposable
     {
+        public HttpClient Client { get; private set; }
+
+        public TestServer Server { get; private set; }
+
         public WebApiHostFixture()
         {
             // Configure the web host.
@@ -23,13 +28,20 @@ namespace Donovan.Tests
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            var builder = WebHost.CreateDefaultBuilder()
-                .UseConfiguration(config)
-                .UseStartup<Startup>();
+            var builder = new HostBuilder()
+                .ConfigureWebHost(web =>
+                {
+                    web
+                        .UseConfiguration(config)
+                        .UseStartup<Startup>()
+                        .UseTestServer();
+                });
 
-            // Create the web server.
-            this.Server = new TestServer(builder);
-            this.Client = this.Server.CreateClient();
+            var host = builder.Start();
+
+            // Create the web server and client.
+            this.Server = host.GetTestServer();
+            this.Client = host.GetTestClient();
         }
 
         #region IDisposable
@@ -56,9 +68,5 @@ namespace Donovan.Tests
         }
 
         #endregion
-
-        public HttpClient Client { get; private set; }
-
-        public TestServer Server { get; private set; }
     }
 }

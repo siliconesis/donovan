@@ -7,6 +7,7 @@ using Microsoft.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Donovan;
 using Donovan.Server;
 using Donovan.Server.Repositories;
@@ -51,8 +52,13 @@ namespace Donovan.Server.Web.Api
             }
 
             app.UseHttpsRedirection();
+
             app.UseRouting();
-            app.UseAuthorization();
+
+            //app.UseAuthentication();
+
+            //app.UseAuthorization();
+
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
