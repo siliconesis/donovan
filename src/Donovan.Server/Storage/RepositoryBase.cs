@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft;
+using Microsoft.Azure;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Donovan.Server.Storage
 {
@@ -14,6 +14,9 @@ namespace Donovan.Server.Storage
 
         public RepositoryBase(IOptions<StorageOptions> options)
         {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+
             this.StorageAccount = CloudStorageAccount.Parse(options.Value.DataStorage);
         }
     }

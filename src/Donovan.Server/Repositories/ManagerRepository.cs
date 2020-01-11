@@ -8,11 +8,11 @@ using Donovan.Server.Storage;
 using Donovan.Server.Storage.Entities;
 using Donovan.Utilities;
 using Microsoft;
+using Microsoft.Azure;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Donovan.Server.Repositories
 {

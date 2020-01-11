@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure;
+using Microsoft.Azure.Cosmos.Table;
 using Donovan;
 using Donovan.Models;
 using Donovan.Utilities;
@@ -16,6 +16,9 @@ namespace Donovan.Server.Storage.Entities
 
         public ManagerEntity(Manager model)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
             this.PartitionKey = Encoder.ToBase64(model.Email);
             this.RowKey = Encoder.ToBase64(model.Email);
 

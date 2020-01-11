@@ -9,11 +9,11 @@ using Donovan.Server;
 using Donovan.Server.Storage;
 using Donovan.Server.Storage.Entities;
 using Microsoft;
+using Microsoft.Azure;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
 using Xunit;
 
 namespace Donovan.Tests.Storage
