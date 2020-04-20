@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace Donovan.Server.Storage
+﻿namespace Donovan.Server.Storage
 {
     public class StorageOptions
     {
-        public string DataStorage { get; set; }
+        public string TableStorage { get; set; }
     }
 }

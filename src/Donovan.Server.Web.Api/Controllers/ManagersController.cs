@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft;
-using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Donovan;
-using Donovan.Models;
-using Donovan.Server;
+using Donovan.Game;
 using Donovan.Server.Services;
+using Donovan.Utilities;
 
 namespace Donovan.Server.Web.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ManagersController : ControllerBase
     {
         private readonly IManagerService service;
@@ -23,53 +22,58 @@ namespace Donovan.Server.Web.Api.Controllers
         }
 
         /// <summary>
-        /// Gets the list of managers based on search criteria.
-        /// </summary>
-        /// <remarks>
-        /// GET api/managers
-        /// </remarks>
-        /*
-        [HttpGet]
-        public IEnumerable<Manager> Get(string q)
-        {
-            System.Diagnostics.Debug.WriteLine(q);
-
-            return new Manager[]
-            {
-                 new Manager { Email = "fred@bedrock.com", Name = "Fred Flintstone", Provider = "Microsoft" },
-                 new Manager { Email = "wilma@bedrock.com", Name = "Wilma Flintstone", Provider = "Google" },
-                 new Manager { Email = "barney@bedrock.com", Name = "Barney Rubble", Provider = "Facebook" },
-                 new Manager { Email = "betty@bedrock.com", Name = "Betty Rubble", Provider = "Microsoft" }
-            };
-        }
-        */
-
-        /// <summary>
         /// Gets a manager.
         /// </summary>
         /// <remarks>
         /// GET api/managers/d2lsbWFAYmVkcm9jay5jb20=
         /// 
-        /// Non-administrators can only retrieve their own information. Administrators
-        /// can retrieve information for any manager.
+        /// Requires an authenticated user. Normal users can can only retrieve their own
+        /// information. Administrators can retrieve information for any manager.
         /// </remarks>
-        [HttpGet("{id}")]
-        [ProducesResponseType(200, Type = typeof(Manager))]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> GetAsync(string id)
+        [HttpGet("{email}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Manager))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Manager>> GetAsync(string email)
         {
-            return Ok(await this.service.GetAsync(id));
+            // TODO: Implement policy (claims?) to ensure only users (managers) can call this API.
+            var manager = await this.service.GetAsync(Base64Helper.FromBase64(email))
+                .ConfigureAwait(false);
+
+            return Ok(manager);
         }
 
         /// <summary>
-        /// Creates a manager.
+        /// Registers a manager.
         /// </summary>
         /// <remarks>
         /// POST api/managers
         /// </remarks>
         [HttpPost]
-        public void Post([FromBody]Manager value)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Manager))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<RegistrationResponse>> RegisterAsync([FromBody]RegistrationRequest request)
         {
+            var response = await this.service.RegisterAsync(request)
+                .ConfigureAwait(false);
+
+            // TODO: Return 409 if manager already exists.
+            // NOTE: Should this be a generic response? Is indicating an account already exists a security hole?
+            return Ok(response);
+        }
+
+        [HttpPost("signin")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SigninResponse))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<SigninResponse>> SignInAsync([FromBody]SigninRequest request)
+        {
+            var response = await this.service.SignInAsync(request)
+                .ConfigureAwait(false);
+
+            if (response == null)
+                return new StatusCodeResult(401);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -79,8 +83,9 @@ namespace Donovan.Server.Web.Api.Controllers
         /// PUT api/managers/d2lsbWFAYmVkcm9jay5jb20=
         /// </remarks>
         [HttpPut("{id}")]
-        public void Put(string id, [FromBody]Manager value)
+        public async Task<ActionResult<Manager>> UpdateAsync(string id, [FromBody]Manager value)
         {
+            return Ok(value);
         }
 
         /// <summary>
@@ -90,9 +95,10 @@ namespace Donovan.Server.Web.Api.Controllers
         /// DELETE api/managers/d2lsbWFAYmVkcm9jay5jb20=
         /// </remarks>
         [HttpDelete("{id}")]
-        public void Delete(string id)
+        public async Task<ActionResult> DeleteAsync(string id)
         {
             // TODO: Security: This should be accessible only to administrators.
+            return Ok();
         }
     }
 }

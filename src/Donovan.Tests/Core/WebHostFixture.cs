@@ -1,27 +1,24 @@
 ﻿using System;
-using System.Net;
-using System.Net.Http;
-using Donovan;
-using Donovan.Server;
-using Donovan.Server.Web;
 using Donovan.Server.Web.Api;
-using Microsoft;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace Donovan.Tests
+namespace Donovan.Tests.Core
 {
-    public class WebApiHostFixture : IDisposable
+    public class WebHostFixture : IDisposable
     {
-        public HttpClient Client { get; private set; }
-
+        /// <summary>
+        /// Gets the test server instance.
+        /// </summary>
+        /// <remarks>
+        /// The test server instance is exposed to callers so that they can create client
+        /// instances in a clean state (e.g. default headers).
+        /// </remarks>
         public TestServer Server { get; private set; }
 
-        public WebApiHostFixture()
+        public WebHostFixture()
         {
             // Configure the web host.
             var config = new ConfigurationBuilder()
@@ -39,9 +36,8 @@ namespace Donovan.Tests
 
             var host = builder.Start();
 
-            // Create the web server and client.
+            // Create the web server.
             this.Server = host.GetTestServer();
-            this.Client = host.GetTestClient();
         }
 
         #region IDisposable
@@ -51,6 +47,8 @@ namespace Donovan.Tests
         public void Dispose()
         {
             Dispose(true);
+
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -59,7 +57,6 @@ namespace Donovan.Tests
             {
                 if (disposing)
                 {
-                    this.Client?.Dispose();
                     this.Server?.Dispose();
                 }
 

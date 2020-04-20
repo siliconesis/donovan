@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace Donovan.Client.Cli.Commands

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Donovan;
-using Donovan.Models;
+using Donovan.Game;
 using Donovan.Utilities;
 
 namespace Donovan.Client
@@ -36,7 +33,7 @@ namespace Donovan.Client
 
         public async Task<Manager> GetManagerAsync(string email)
         {
-            var id = Encoder.ToBase64(email);
+            var id = Base64Helper.ToBase64(email);
 
             this.builder.Path = $"/api/managers/{id}";
 
