@@ -1,0 +1,30 @@
+# Development Pipeline
+name: $(versionMajor).$(versionMinor).$(versionPatch)-$(versionPrelease)+$(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+      - '*'
+    exclude:
+      - master
+
+pr:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  versionMajor: '0'
+  versionMinor: '1'
+  versionPatch: '0'
+  versionPrelease: 'dev'
+  versionBuildMetadata: ''
+
+steps:
+- bash: echo "Hello, world."
