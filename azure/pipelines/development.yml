@@ -13,9 +13,6 @@ pr:
     include:
       - master
 
-pool:
-  vmImage: 'windows-latest'
-
 variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
@@ -26,5 +23,82 @@ variables:
   versionPrelease: 'dev'
   versionBuildMetadata: ''
 
-steps:
-- bash: echo "Hello, world."
+pool:
+  vmImage: 'windows-latest'
+
+stages:
+
+- stage: 'Build'
+  displayName: 'Build'
+
+  jobs:
+
+  - job: 'BuildSolution'
+    displayName: 'Build Solution'
+
+    steps:
+
+    - task: NuGetToolInstaller@1
+
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(solution)'
+
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+
+- stage: 'Deploy'
+  displayName: 'Deploy'
+
+  jobs:
+
+  - job: 'DeployEnvironment'
+    displayName: 'Deploy Environment'
+
+    steps:
+    
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Deploy Resources (Data)'
+      inputs:
+        azureSubscription: SiliconesisSubscription
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: 'si-dn-dev-def-dat-rgp'
+        location: 'westus2'
+        templateLocation: 'Linked artifact'
+        csmFile: 'azure/templates/development-data.json'
+        csmParametersFile: ''
+        overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
+        deploymentMode: 'Incremental'
+
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Deploy Resources (Application)'
+      inputs:
+        azureSubscription: SiliconesisSubscription
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: 'si-dn-dev-def-app-rgp'
+        location: 'westus2'
+        templateLocation: 'Linked artifact'
+        csmFile: 'azure/templates/development-application.json'
+        csmParametersFile: ''
+        overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
+        deploymentMode: 'Incremental'
+
+- stage: 'Configure'
+  displayName: 'Configure'
+
+  jobs:
+
+  - job: 'ConfigureDatabase'
+    displayName: 'Configure Database'
+
+- stage: 'Test'
+  displayName: 'Test'
+
+  jobs:
+
+  - job: 'TestCode'
+    displayName: 'Test Code'

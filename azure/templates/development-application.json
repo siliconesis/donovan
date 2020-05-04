@@ -1,0 +1,97 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "0.1.0.0",
+    "parameters": {
+        "sourceBranchName": {
+            "type": "string"
+        },
+        "sourceCommitId": {
+            "type": "string"
+        }
+    },
+    "functions": [
+    ],
+    "variables": {
+        "azureAspName": "si-dn-dev-def-wap-asp",
+        "azureAppNameApi": "si-dn-dev-def-api-asv",
+        "azureAppNameWeb": "si-dn-dev-def-web-asv",
+        "environment": "Development"
+    },
+    "resources": [
+        {
+            "name": "[variables('azureAspName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2019-08-01",
+            "tags": {
+                "Description": "The host environment for the web applications.",
+                "Environment": "[variables('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "app",
+            "sku": {
+                "tier": "Free",
+                "name": "F1"
+            },
+            "properties": {
+            }
+        },
+        {
+            "name": "[variables('azureAppNameApi')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "tags": {
+                "Description": "The web application for the web API.",
+                "Environment": "[variables('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "app",
+            "properties": {
+                "siteConfig": {
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "dotnetcore"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('azureAspName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('azureAspName'))]"
+            ]
+        },
+        {
+            "name": "[variables('azureAppNameWeb')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "tags": {
+                "Description": "The web application for the web site.",
+                "Environment": "[variables('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "app",
+            "properties": {
+                "siteConfig": {
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "dotnetcore"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('azureAspName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('azureAspName'))]"
+            ]
+        }
+    ],
+    "outputs": {
+    }
+}

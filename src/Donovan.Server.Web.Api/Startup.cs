@@ -64,8 +64,8 @@ namespace Donovan.Server.Web.Api
             services.AddTransient<IConfigurationRepository, ConfigurationRepository>();
             services.AddTransient<IClientService, ClientService>();
             services.AddTransient<IClientRepository, ClientRepository>();
-            services.AddTransient<IManagerRepository, ManagerRepository>();
             services.AddTransient<IManagerService, ManagerService>();
+            services.AddTransient<IManagerRepository, ManagerRepository>();
 
             // Register configuration options.
             services.Configure<StorageOptions>(this.Configuration.GetSection("ConnectionStrings"));
