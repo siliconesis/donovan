@@ -1,0 +1,16 @@
+<Project>
+  <!--
+    Use strict NuGet configuration to enable Azure Pipeline caching.
+    https://github.com/NuGet/Home/issues/7921
+    https://github.com/NuGet/Home/issues/8604
+
+    Pipeline caching was found to be slow, but preserving NuGet configuration
+    as it is considered a best practice for repeatable CI/CD builds.
+    https://github.com/microsoft/azure-pipelines-tasks/issues/11864
+  -->
+  <PropertyGroup>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    <RestoreLockedMode>true</RestoreLockedMode>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+</Project>

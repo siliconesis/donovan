@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Donovan.Client.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "register --email donovan@example.com --provider microsoft"
+    }
+  }
+}

@@ -14,14 +14,19 @@ pr:
       - master
 
 variables:
+  system.debug: true
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  buildConfiguration: 'Debug'
   versionMajor: '0'
   versionMinor: '1'
   versionPatch: '0'
   versionPrelease: 'dev'
   versionBuildMetadata: ''
+  azureSubscription: 'SiliconesisSubscription'
+  artifactArmTemplates: 'arm-templates'
+  artifactWebApi: 'web-api'
+  artifactWebSite: 'web-site'
 
 pool:
   vmImage: 'windows-latest'
@@ -33,59 +38,120 @@ stages:
 
   jobs:
 
-  - job: 'BuildSolution'
-    displayName: 'Build Solution'
+  - job: 'BuildPackage'
+    displayName: 'Build & Package'
 
     steps:
 
-    - task: NuGetToolInstaller@1
-
-    - task: NuGetCommand@2
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore NuGet Packages'
       inputs:
-        restoreSolution: '$(solution)'
+        command: 'restore'
+        projects: '$(solution)'
 
     - task: VSBuild@1
+      displayName: 'Build Solution'
       inputs:
         solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(Build.ArtifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
+
+    # TODO: Incorporate build configuration into packaging.
+    - task: DotNetCoreCLI@2
+      displayName: 'Package Web API'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '**/Donovan.Server.Web.Api.csproj'
+        zipAfterPublish: true
+
+    # TODO: Parameterize target path to align with build configuration.
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Web API'
+      inputs:
+        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Server.Web.Api/bin/Debug/netcoreapp3.1/publish.zip'
+        artifactName: '$(artifactWebApi)'
+
+    # TODO: Incorporate build configuration into packaging.
+    - task: DotNetCoreCLI@2
+      displayName: 'Package Web Site'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '**/Donovan.Server.Web.csproj'
+        zipAfterPublish: true
+
+    # TODO: Parameterize target path to align with build configuration.
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Web Site'
+      inputs:
+        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Server.Web/bin/Debug/netcoreapp3.1/publish.zip'
+        artifactName: '$(artifactWebSite)'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish ARM Templates'
+      inputs:
+        targetPath: '$(Build.SourcesDirectory)/azure/templates'
+        artifactName: '$(artifactArmTemplates)'
 
 - stage: 'Deploy'
   displayName: 'Deploy'
 
   jobs:
 
-  - job: 'DeployEnvironment'
-    displayName: 'Deploy Environment'
+  - deployment: 'DeployApplication'
+    displayName: 'Deploy Application'
+    environment: 'Development'
 
-    steps:
-    
-    - task: AzureResourceGroupDeployment@2
-      displayName: 'Deploy Resources (Data)'
-      inputs:
-        azureSubscription: SiliconesisSubscription
-        action: 'Create Or Update Resource Group'
-        resourceGroupName: 'si-dn-dev-def-dat-rgp'
-        location: 'westus2'
-        templateLocation: 'Linked artifact'
-        csmFile: 'azure/templates/development-data.json'
-        csmParametersFile: ''
-        overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
-        deploymentMode: 'Incremental'
+    strategy:
+      runOnce:
+        deploy:
 
-    - task: AzureResourceGroupDeployment@2
-      displayName: 'Deploy Resources (Application)'
-      inputs:
-        azureSubscription: SiliconesisSubscription
-        action: 'Create Or Update Resource Group'
-        resourceGroupName: 'si-dn-dev-def-app-rgp'
-        location: 'westus2'
-        templateLocation: 'Linked artifact'
-        csmFile: 'azure/templates/development-application.json'
-        csmParametersFile: ''
-        overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
-        deploymentMode: 'Incremental'
+          steps:
+
+          - task: AzureResourceGroupDeployment@2
+            displayName: 'Deploy Resource Group (Data)'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'si-dn-dev-def-dat-rgp'
+              location: 'westus2'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Pipeline.Workspace)/$(artifactArmTemplates)/development-data.json'
+              csmParametersFile: ''
+              overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
+              deploymentMode: 'Incremental'
+
+          - task: AzureResourceGroupDeployment@2
+            displayName: 'Deploy Resource Group (Application)'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'si-dn-dev-def-app-rgp'
+              location: 'westus2'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Pipeline.Workspace)/$(artifactArmTemplates)/development-application.json'
+              csmParametersFile: ''
+              overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
+              deploymentMode: 'Incremental'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy Web API'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: 'webApp'
+              appName: 'si-dn-dev-def-api-asv'
+              package: '$(Pipeline.Workspace)/$(artifactWebApi)/publish.zip'
+              deploymentMethod: 'zipDeploy'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy Web Site'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: 'webApp'
+              appName: 'si-dn-dev-def-web-asv'
+              package: '$(Pipeline.Workspace)/$(artifactWebSite)/publish.zip'
+              deploymentMethod: 'zipDeploy'
 
 - stage: 'Configure'
   displayName: 'Configure'
@@ -95,6 +161,9 @@ stages:
   - job: 'ConfigureDatabase'
     displayName: 'Configure Database'
 
+    steps:
+    - checkout: none
+
 - stage: 'Test'
   displayName: 'Test'
 
@@ -102,3 +171,6 @@ stages:
 
   - job: 'TestCode'
     displayName: 'Test Code'
+
+    steps:
+    - checkout: none

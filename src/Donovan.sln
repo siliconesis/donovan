@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donovan.Server.Web.Api", "D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donovan.Server", "Donovan.Server\Donovan.Server.csproj", "{23624716-79B8-43EA-87BB-2C95FF0D94B7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donovan.Server.Web", "Donovan.Server.Web\Donovan.Server.Web.csproj", "{6A7D3DB7-FCA2-46F0-8ABD-FEBAF2F4879E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{23624716-79B8-43EA-87BB-2C95FF0D94B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23624716-79B8-43EA-87BB-2C95FF0D94B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23624716-79B8-43EA-87BB-2C95FF0D94B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A7D3DB7-FCA2-46F0-8ABD-FEBAF2F4879E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A7D3DB7-FCA2-46F0-8ABD-FEBAF2F4879E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A7D3DB7-FCA2-46F0-8ABD-FEBAF2F4879E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A7D3DB7-FCA2-46F0-8ABD-FEBAF2F4879E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
