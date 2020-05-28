@@ -1,5 +1,5 @@
 # Development Pipeline
-name: $(versionMajor).$(versionMinor).$(versionPatch)-$(versionPrelease)+$(Date:yyyyMMdd).$(Rev:r)
+name: $(Version)-$(Version.Prerelease)+$(Date:yyyyMMdd).$(Rev:r)
 
 trigger:
   branches:
@@ -8,25 +8,14 @@ trigger:
     exclude:
       - master
 
-pr:
-  branches:
-    include:
-      - master
+#pr:
+#  branches:
+#    include:
+#      - master
 
 variables:
-  system.debug: true
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Debug'
-  versionMajor: '0'
-  versionMinor: '1'
-  versionPatch: '0'
-  versionPrelease: 'dev'
-  versionBuildMetadata: ''
-  azureSubscription: 'SiliconesisSubscription'
-  artifactArmTemplates: 'arm-templates'
-  artifactWebApi: 'web-api'
-  artifactWebSite: 'web-site'
+- group: 'Pipeline.Development'
+- group: 'Azure.Development'
 
 pool:
   vmImage: 'windows-latest'
@@ -47,52 +36,66 @@ stages:
       displayName: 'Restore NuGet Packages'
       inputs:
         command: 'restore'
-        projects: '$(solution)'
+        projects: '$(Solution)'
 
     - task: VSBuild@1
       displayName: 'Build Solution'
       inputs:
-        solution: '$(solution)'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
+        solution: '$(Solution)'
+        platform: '$(Solution.Platform)'
+        configuration: '$(Solution.Configuration)'
 
-    # TODO: Incorporate build configuration into packaging.
+    # Identity Web Site
     - task: DotNetCoreCLI@2
-      displayName: 'Package Web API'
+      displayName: 'Package Identity Web Site'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '**/Donovan.Server.Web.Identity.csproj'
+        zipAfterPublish: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Identity Web Site'
+      inputs:
+        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Server.Web.Identity/bin/$(Solution.Configuration)/netcoreapp3.1/publish.zip'
+        artifactName: '$(Artifact.IdentityWebSite)'
+
+    # Game Web API
+    - task: DotNetCoreCLI@2
+      displayName: 'Package Game Web API'
       inputs:
         command: 'publish'
         publishWebProjects: false
         projects: '**/Donovan.Server.Web.Api.csproj'
         zipAfterPublish: true
 
-    # TODO: Parameterize target path to align with build configuration.
     - task: PublishPipelineArtifact@1
-      displayName: 'Publish Web API'
+      displayName: 'Publish Game Web API'
       inputs:
-        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Server.Web.Api/bin/Debug/netcoreapp3.1/publish.zip'
-        artifactName: '$(artifactWebApi)'
+        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Server.Web.Api/bin/$(Solution.Configuration)/netcoreapp3.1/publish.zip'
+        artifactName: '$(Artifact.GameWebApi)'
 
-    # TODO: Incorporate build configuration into packaging.
+    # Game Web Site
     - task: DotNetCoreCLI@2
-      displayName: 'Package Web Site'
+      displayName: 'Package Game Web Site'
       inputs:
         command: 'publish'
         publishWebProjects: false
         projects: '**/Donovan.Server.Web.csproj'
         zipAfterPublish: true
 
-    # TODO: Parameterize target path to align with build configuration.
     - task: PublishPipelineArtifact@1
-      displayName: 'Publish Web Site'
+      displayName: 'Publish Game Web Site'
       inputs:
-        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Server.Web/bin/Debug/netcoreapp3.1/publish.zip'
-        artifactName: '$(artifactWebSite)'
+        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Server.Web/bin/$(Solution.Configuration)/netcoreapp3.1/publish.zip'
+        artifactName: '$(Artifact.GameWebSite)'
 
+    # Azure Resource Manager Templates
     - task: PublishPipelineArtifact@1
       displayName: 'Publish ARM Templates'
       inputs:
         targetPath: '$(Build.SourcesDirectory)/azure/templates'
-        artifactName: '$(artifactArmTemplates)'
+        artifactName: '$(Artifact.ArmTemplates)'
 
 - stage: 'Deploy'
   displayName: 'Deploy'
@@ -101,7 +104,7 @@ stages:
 
   - deployment: 'DeployApplication'
     displayName: 'Deploy Application'
-    environment: 'Development'
+    environment: '$(Environment)'
 
     strategy:
       runOnce:
@@ -109,60 +112,138 @@ stages:
 
           steps:
 
+          # Hosting Resources
           - task: AzureResourceGroupDeployment@2
-            displayName: 'Deploy Resource Group (Data)'
+            displayName: 'Deploy Hosting Resources'
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: '$(Azure.Subscription)'
               action: 'Create Or Update Resource Group'
-              resourceGroupName: 'si-dn-dev-def-dat-rgp'
-              location: 'westus2'
+              resourceGroupName: '$(Resources.HostingResourceGroupName)'
+              location: '$(Azure.Location)'
               templateLocation: 'Linked artifact'
-              csmFile: '$(Pipeline.Workspace)/$(artifactArmTemplates)/development-data.json'
+              csmFile: '$(Pipeline.Workspace)/$(Artifact.ArmTemplates)/hosting.json'
               csmParametersFile: ''
-              overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
+              overrideParameters: '
+                -environment "$(Environment)"
+                -sourceBranchName "$(Build.SourceBranchName)"
+                -sourceCommitId "$(Build.SourceVersion)"
+                -hostingResourceName "$(Resources.HostingResourceName)"'
               deploymentMode: 'Incremental'
 
+          # Identity Resources
           - task: AzureResourceGroupDeployment@2
-            displayName: 'Deploy Resource Group (Application)'
+            displayName: 'Deploy Identity Resources'
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: '$(Azure.Subscription)'
               action: 'Create Or Update Resource Group'
-              resourceGroupName: 'si-dn-dev-def-app-rgp'
-              location: 'westus2'
+              resourceGroupName: '$(Resources.IdentityResourceGroupName)'
+              location: '$(Azure.Location)'
               templateLocation: 'Linked artifact'
-              csmFile: '$(Pipeline.Workspace)/$(artifactArmTemplates)/development-application.json'
+              csmFile: '$(Pipeline.Workspace)/$(Artifact.ArmTemplates)/identity.json'
               csmParametersFile: ''
-              overrideParameters: '-sourceBranchName "$(Build.SourceBranchName)" -sourceCommitId "$(Build.SourceVersion)"'
+              overrideParameters: '
+                -environment "$(Environment)"
+                -sourceBranchName "$(Build.SourceBranchName)"
+                -sourceCommitId "$(Build.SourceVersion)"
+                -identityDatabaseResourceName "$(Resources.IdentityDatabaseResourceName)"
+                -identityWebSiteHostingResourceGroupName "$(Resources.HostingResourceGroupName)"
+                -identityWebSiteHostingResourceName "$(Resources.HostingResourceName)"
+                -identityWebSiteResourceName "$(Resources.IdentityWebSiteResourceName)"'
               deploymentMode: 'Incremental'
-
+  
+          # Identity Web Site
           - task: AzureWebApp@1
-            displayName: 'Deploy Web API'
+            displayName: 'Deploy Identity Web Site'
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: '$(Azure.Subscription)'
               appType: 'webApp'
-              appName: 'si-dn-dev-def-api-asv'
-              package: '$(Pipeline.Workspace)/$(artifactWebApi)/publish.zip'
+              appName: '$(Resources.IdentityWebSiteResourceName)'
+              package: '$(Pipeline.Workspace)/$(Artifact.IdentityWebSite)/publish.zip'
               deploymentMethod: 'zipDeploy'
 
-          - task: AzureWebApp@1
-            displayName: 'Deploy Web Site'
+          # Game Resources
+          - task: AzureResourceGroupDeployment@2
+            displayName: 'Deploy Game Resources'
             inputs:
-              azureSubscription: '$(azureSubscription)'
+              azureSubscription: '$(Azure.Subscription)'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: '$(Resources.GameResourceGroupName)'
+              location: '$(Azure.Location)'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Pipeline.Workspace)/$(Artifact.ArmTemplates)/game.json'
+              csmParametersFile: ''
+              overrideParameters: '
+                -environment "$(Environment)"
+                -sourceBranchName "$(Build.SourceBranchName)"
+                -sourceCommitId "$(Build.SourceVersion)"
+                -gameDatabaseResourceName "$(Resources.GameDatabaseResourceName)"
+                -gameWebApiHostingResourceGroupName "$(Resources.HostingResourceGroupName)"
+                -gameWebApiHostingResourceName "$(Resources.HostingResourceName)"
+                -gameWebApiResourceName "$(Resources.GameWebApiResourceName)"
+                -gameWebSiteHostingResourceGroupName "$(Resources.HostingResourceGroupName)"
+                -gameWebSiteHostingResourceName "$(Resources.HostingResourceName)"
+                -gameWebSiteResourceName "$(Resources.GameWebSiteResourceName)"'
+              deploymentMode: 'Incremental'
+
+          # Game Web API
+          - task: AzureWebApp@1
+            displayName: 'Deploy Game Web API'
+            inputs:
+              azureSubscription: '$(Azure.Subscription)'
               appType: 'webApp'
-              appName: 'si-dn-dev-def-web-asv'
-              package: '$(Pipeline.Workspace)/$(artifactWebSite)/publish.zip'
+              appName: '$(Resources.GameWebApiResourceName)'
+              package: '$(Pipeline.Workspace)/$(Artifact.GameWebApi)/publish.zip'
+              deploymentMethod: 'zipDeploy'
+
+          # Game Web Site
+          - task: AzureWebApp@1
+            displayName: 'Deploy Game Web Site'
+            inputs:
+              azureSubscription: '$(Azure.Subscription)'
+              appType: 'webApp'
+              appName: '$(Resources.GameWebSiteResourceName)'
+              package: '$(Pipeline.Workspace)/$(Artifact.GameWebSite)/publish.zip'
               deploymentMethod: 'zipDeploy'
 
 - stage: 'Configure'
   displayName: 'Configure'
 
+  variables:
+  - group: 'AppSettings.Development'
+
   jobs:
 
-  - job: 'ConfigureDatabase'
-    displayName: 'Configure Database'
+  - job: 'ConfigureIdentity'
+    displayName: 'Configure Identity'
 
     steps:
     - checkout: none
+
+  - job: 'ConfigureGame'
+    displayName: 'Configure Game'
+
+    steps:
+    - checkout: none
+
+    - task: AzureAppServiceSettings@1
+      displayName: 'Configure Game Web Site'
+      inputs:
+        azureSubscription: '$(Azure.Subscription)'
+        appName: '$(Resources.GameWebSiteResourceName)'
+        resourceGroupName: '$(Resources.GameResourceGroupName)'
+        appSettings: |
+          [
+            {
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "$(Environment)",
+              "slotSetting": false
+            },
+            {
+              "name": "IdentityAzureTable:IdentityConfiguration:StorageConnectionString",
+              "value": "$(Game.WebSite.IdentityAzureTable.IdentityConfiguration.StorageConnectionString)",
+              "slotSetting": false
+            }
+          ]
 
 - stage: 'Test'
   displayName: 'Test'

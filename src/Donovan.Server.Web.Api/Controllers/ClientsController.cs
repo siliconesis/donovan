@@ -26,8 +26,7 @@ namespace Donovan.Server.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<AuthenticationResponse>> LogInAsync([FromBody]AuthenticationRequest request)
         {
-            var response = await this.service.AuthenticateAsync(request)
-                .ConfigureAwait(false);
+            var response = await this.service.AuthenticateAsync(request);
 
             if (response == null)
                 return new StatusCodeResult(401);

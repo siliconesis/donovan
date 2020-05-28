@@ -29,10 +29,9 @@ namespace Donovan.Tests
 
             using (var client = this.Fixture.Server.CreateClient())
             using (var content = RequestHelper.CreateRequestContentForClientAuthentication(id, secret))
-            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content).ConfigureAwait(false))
+            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content))
             {
-                var authenticationResponse = await response.Content.ReadAsAsync<AuthenticationResponse>()
-                    .ConfigureAwait(false);
+                var authenticationResponse = await response.Content.ReadAsAsync<AuthenticationResponse>();
 
                 encoded = authenticationResponse.Token;
             }
@@ -47,7 +46,7 @@ namespace Donovan.Tests
         {
             using (var client = this.Fixture.Server.CreateClient())
             using (var content = RequestHelper.CreateRequestContentForClientAuthentication(id, secret))
-            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content).ConfigureAwait(false))
+            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content))
             {
                 Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }
@@ -59,7 +58,7 @@ namespace Donovan.Tests
         {
             using (var client = this.Fixture.Server.CreateClient())
             using (var content = RequestHelper.CreateRequestContentForClientAuthentication(id, secret))
-            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content).ConfigureAwait(false))
+            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content))
             {
                 Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }
@@ -71,7 +70,7 @@ namespace Donovan.Tests
         {
             using (var client = this.Fixture.Server.CreateClient())
             using (var content = RequestHelper.CreateRequestContentForClientAuthentication(id, secret))
-            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content).ConfigureAwait(false))
+            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content))
             {
                 Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }

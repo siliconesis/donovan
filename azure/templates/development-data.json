@@ -16,11 +16,11 @@
     },
     "resources": [
         {
-            "name": "sidndevdefdatstg",
+            "name": "sidndevdefarcstg",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "tags": {
-                "Description": "Core database for the application.",
+                "Description": "Message archive.",
                 "Environment": "[variables('environment')]",
                 "SourceBranchName": "[parameters('sourceBranchName')]",
                 "SourceCommitId": "[parameters('sourceCommitId')]"
@@ -42,6 +42,48 @@
             "apiVersion": "2019-06-01",
             "tags": {
                 "Description": "Checkpoint storage for Event Hubs consumer groups.",
+                "Environment": "[variables('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "tier": "Standard",
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "name": "sidndevdefgamstg",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "Description": "Game database.",
+                "Environment": "[variables('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "tier": "Standard",
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "name": "sidndevdefidsstg",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "Description": "Identity database.",
                 "Environment": "[variables('environment')]",
                 "SourceBranchName": "[parameters('sourceBranchName')]",
                 "SourceCommitId": "[parameters('sourceCommitId')]"

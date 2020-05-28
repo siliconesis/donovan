@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ElCamino.AspNetCore.Identity.AzureTable;
+using ElCamino.AspNetCore.Identity.AzureTable.Model;
+using Donovan.Server.Web.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
+using IdentityUser = ElCamino.AspNetCore.Identity.AzureTable.Model.IdentityUser;
 
 namespace Donovan.Server.Web
 {
@@ -23,6 +28,30 @@ namespace Donovan.Server.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Configure identity services.
+            services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddAzureTableStores<IdentityDataContext>(new Func<IdentityConfiguration>(() =>
+            {
+                var config = new IdentityConfiguration
+                {
+                    TablePrefix = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value,
+                    StorageConnectionString = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value,
+                    LocationMode = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:LocationMode").Value,
+                    IndexTableName = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:IndexTableName").Value,
+                    RoleTableName = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:RoleTableName").Value,
+                    UserTableName = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:UserTableName").Value
+                };
+
+                return config;
+            }))
+            .AddDefaultTokenProviders()
+            .CreateAzureTablesIfNotExists<IdentityDataContext>();
+
+            // Configure Razor support.
             services.AddRazorPages();
         }
 
@@ -36,6 +65,7 @@ namespace Donovan.Server.Web
             else
             {
                 app.UseExceptionHandler("/Error");
+
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -45,6 +75,7 @@ namespace Donovan.Server.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

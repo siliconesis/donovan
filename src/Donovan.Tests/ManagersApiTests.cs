@@ -28,8 +28,7 @@ namespace Donovan.Tests
         [InlineData("donovan_tests", "QJIE3ZQeY1f10K146DA7IkpWy4bMXnUG", "fred@bedrock.com", "Fred Flintstone")]
         public async Task ManagersGet(string clientId, string clientSecret, string managerEmail, string managerName)
         {
-            var clientToken = await this.GetClientTokenAsync(clientId, clientSecret)
-                .ConfigureAwait(false);
+            var clientToken = await this.GetClientTokenAsync(clientId, clientSecret);
 
             var managerToken = null as string;
 
@@ -37,12 +36,11 @@ namespace Donovan.Tests
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", clientToken);
 
-                using (var response = await client.GetAsync(new Uri(client.BaseAddress, $"{WebApiUris.Managers}/{Base64Helper.ToBase64(managerEmail)}")).ConfigureAwait(false))
+                using (var response = await client.GetAsync(new Uri(client.BaseAddress, $"{WebApiUris.Managers}/{Base64Helper.ToBase64(managerEmail)}")))
                 {
                     response.EnsureSuccessStatusCode();
 
-                    var manager = await response.Content.ReadAsAsync<Manager>()
-                        .ConfigureAwait(false);
+                    var manager = await response.Content.ReadAsAsync<Manager>();
 
                     Assert.Equal(managerName, manager.Name);
                 }
@@ -54,7 +52,7 @@ namespace Donovan.Tests
         public async Task ManagersGetUnauthorized(string managerEmail)
         {
             using (var client = this.Fixture.Server.CreateClient())
-            using (var response = await client.GetAsync(new Uri(client.BaseAddress, $"{WebApiUris.Managers}/{Base64Helper.ToBase64(managerEmail)}")).ConfigureAwait(false))
+            using (var response = await client.GetAsync(new Uri(client.BaseAddress, $"{WebApiUris.Managers}/{Base64Helper.ToBase64(managerEmail)}")))
             {
                 Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             }
@@ -64,20 +62,18 @@ namespace Donovan.Tests
         [InlineData("donovan_tests", "QJIE3ZQeY1f10K146DA7IkpWy4bMXnUG", "barney@bedrock.com", "Barney Rubble", "VyxXyYXyV6es2azkRPWLD4kpYRjaMYyG")]
         public async Task ManagersRegister(string clientId, string clientSecret, string managerEmail, string managerName, string managerPassword)
         {
-            var clientToken = await this.GetClientTokenAsync(clientId, clientSecret)
-                .ConfigureAwait(false);
+            var clientToken = await this.GetClientTokenAsync(clientId, clientSecret);
 
             using (var client = this.Fixture.Server.CreateClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", clientToken);
 
                 using (var content = RequestHelper.CreateRequestContentForManagerRegistration(managerEmail, managerName, managerPassword))
-                using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.Managers), content).ConfigureAwait(false))
+                using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.Managers), content))
                 {
                     response.EnsureSuccessStatusCode();
 
-                    var registration = await response.Content.ReadAsAsync<RegistrationResponse>()
-                        .ConfigureAwait(false);
+                    var registration = await response.Content.ReadAsAsync<RegistrationResponse>();
 
                     var manager = registration.Manager;
 
@@ -104,12 +100,11 @@ namespace Donovan.Tests
 
             using (var client = this.Fixture.Server.CreateClient())
             using (var content = RequestHelper.CreateRequestContentForClientAuthentication(clientId, clientSecret))
-            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content).ConfigureAwait(false))
+            using (var response = await client.PostAsync(new Uri(client.BaseAddress, WebApiUris.ClientsAuthenticate), content))
             {
                 response.EnsureSuccessStatusCode();
 
-                var authenticationResponse = await response.Content.ReadAsAsync<AuthenticationResponse>()
-                    .ConfigureAwait(false);
+                var authenticationResponse = await response.Content.ReadAsAsync<AuthenticationResponse>();
 
                 clientToken = authenticationResponse.Token;
             }

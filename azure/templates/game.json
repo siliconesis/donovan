@@ -1,0 +1,113 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "0.1.0.0",
+    "parameters": {
+        "environment": {
+            "type": "string"
+        },
+        "sourceBranchName": {
+            "type": "string"
+        },
+        "sourceCommitId": {
+            "type": "string"
+        },
+        "gameDatabaseResourceName": {
+            "type": "string"
+        },
+        "gameWebApiHostingResourceGroupName": {
+            "type": "string"
+        },
+        "gameWebApiHostingResourceName": {
+            "type": "string"
+        },
+        "gameWebApiResourceName": {
+            "type": "string"
+        },
+        "gameWebSiteHostingResourceGroupName": {
+            "type": "string"
+        },
+        "gameWebSiteHostingResourceName": {
+            "type": "string"
+        },
+        "gameWebSiteResourceName": {
+            "type": "string"
+        }
+    },
+    "functions": [
+    ],
+    "variables": {
+    },
+    "resources": [
+        {
+            "name": "[parameters('gameDatabaseResourceName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "Description": "The database for the game application.",
+                "Environment": "[parameters('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "tier": "Standard",
+                "name": "Standard_LRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "name": "[parameters('gameWebApiResourceName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "tags": {
+                "Description": "The web API for the game application.",
+                "Environment": "[parameters('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "app",
+            "properties": {
+                "siteConfig": {
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "dotnetcore"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId(parameters('gameWebApiHostingResourceGroupName'), 'Microsoft.Web/serverfarms', parameters('gameWebApiHostingResourceName'))]"
+            }
+        },
+        {
+            "name": "[parameters('gameWebSiteResourceName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "tags": {
+                "Description": "The web site for the game application.",
+                "Environment": "[parameters('environment')]",
+                "SourceBranchName": "[parameters('sourceBranchName')]",
+                "SourceCommitId": "[parameters('sourceCommitId')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "app",
+            "properties": {
+                "siteConfig": {
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "dotnetcore"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId(parameters('gameWebSiteHostingResourceGroupName'), 'Microsoft.Web/serverfarms', parameters('gameWebSiteHostingResourceName'))]"
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

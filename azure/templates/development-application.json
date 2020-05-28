@@ -14,6 +14,7 @@
     "variables": {
         "azureAspName": "si-dn-dev-def-wap-asp",
         "azureAppNameApi": "si-dn-dev-def-api-asv",
+        "azureAppNameIds": "si-dn-dev-def-ids-asv",
         "azureAppNameWeb": "si-dn-dev-def-web-asv",
         "environment": "Development"
     },

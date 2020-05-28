@@ -36,8 +36,7 @@ namespace Donovan.Server.Web.Api.Controllers
         public async Task<ActionResult<Manager>> GetAsync(string email)
         {
             // TODO: Implement policy (claims?) to ensure only users (managers) can call this API.
-            var manager = await this.service.GetAsync(Base64Helper.FromBase64(email))
-                .ConfigureAwait(false);
+            var manager = await this.service.GetAsync(Base64Helper.FromBase64(email));
 
             return Ok(manager);
         }
@@ -54,8 +53,7 @@ namespace Donovan.Server.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<RegistrationResponse>> RegisterAsync([FromBody]RegistrationRequest request)
         {
-            var response = await this.service.RegisterAsync(request)
-                .ConfigureAwait(false);
+            var response = await this.service.RegisterAsync(request);
 
             // TODO: Return 409 if manager already exists.
             // NOTE: Should this be a generic response? Is indicating an account already exists a security hole?
@@ -67,8 +65,7 @@ namespace Donovan.Server.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<SigninResponse>> SignInAsync([FromBody]SigninRequest request)
         {
-            var response = await this.service.SignInAsync(request)
-                .ConfigureAwait(false);
+            var response = await this.service.SignInAsync(request);
 
             if (response == null)
                 return new StatusCodeResult(401);
