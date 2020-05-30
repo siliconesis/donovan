@@ -8,10 +8,10 @@ trigger:
     exclude:
       - master
 
-#pr:
-#  branches:
-#    include:
-#      - master
+pr:
+  branches:
+    include:
+      - master
 
 variables:
 - group: 'Pipeline.Development'
