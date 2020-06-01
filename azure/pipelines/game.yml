@@ -1,0 +1,42 @@
+name: $(Version)-$(Version.Prerelease)+$(Date:yyyyMMdd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+      - '*'
+
+pr:
+  branches:
+    include:
+      - master
+
+variables:
+  - group: 'Game.Pipeline'
+
+pool:
+  vmImage: 'windows-latest'
+
+stages:
+
+- stage: 'Build'
+  displayName: 'Build'
+
+  jobs:
+
+  - job: 'Build'
+    displayName: 'Build'
+
+    steps:
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        command: 'restore'
+        projects: '$(Solution)'
+
+    - task: VSBuild@1
+      displayName: 'Build Solution'
+      inputs:
+        solution: '$(Solution)'
+        platform: '$(Solution.Platform)'
+        configuration: '$(Solution.Configuration)'
