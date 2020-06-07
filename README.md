@@ -6,4 +6,6 @@ Simulates small-sided soccer games between user-created teams using statistical 
 
 | Pipeline    | Status |
 |-------------|--------|
-| Development | [![Build Status](https://dev.azure.com/siliconesis/Donovan/_apis/build/status/Development?branchName=master)](https://dev.azure.com/siliconesis/Donovan/_build/latest?definitionId=4&branchName=master) |
+| Identity    | TBD    |
+| Game        | [![Build Status](https://dev.azure.com/siliconesis/Donovan/_apis/build/status/Game?branchName=master)](https://dev.azure.com/siliconesis/Donovan/_build/latest?definitionId=5&branchName=master) |
+| Simulation  | TBD    |

@@ -5,6 +5,12 @@ VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donovan.Game.Web", "Donovan.Game.Web\Donovan.Game.Web.csproj", "{86BD42C8-794D-4B28-9E36-7C0465903077}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donovan.Game.Tests", "Donovan.Game.Tests\Donovan.Game.Tests.csproj", "{92D578B4-AF1D-4AEB-B84F-03D21384C4C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donovan.Game", "Donovan.Game\Donovan.Game.csproj", "{7D5F27D0-E886-4DA6-BA41-C9458EA2D5A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Donovan", "Donovan\Donovan.csproj", "{9C7CC3F4-3DC9-4455-90EE-6008A7092AB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{86BD42C8-794D-4B28-9E36-7C0465903077}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86BD42C8-794D-4B28-9E36-7C0465903077}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86BD42C8-794D-4B28-9E36-7C0465903077}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92D578B4-AF1D-4AEB-B84F-03D21384C4C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92D578B4-AF1D-4AEB-B84F-03D21384C4C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92D578B4-AF1D-4AEB-B84F-03D21384C4C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92D578B4-AF1D-4AEB-B84F-03D21384C4C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D5F27D0-E886-4DA6-BA41-C9458EA2D5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D5F27D0-E886-4DA6-BA41-C9458EA2D5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D5F27D0-E886-4DA6-BA41-C9458EA2D5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D5F27D0-E886-4DA6-BA41-C9458EA2D5A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C7CC3F4-3DC9-4455-90EE-6008A7092AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C7CC3F4-3DC9-4455-90EE-6008A7092AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C7CC3F4-3DC9-4455-90EE-6008A7092AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C7CC3F4-3DC9-4455-90EE-6008A7092AB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

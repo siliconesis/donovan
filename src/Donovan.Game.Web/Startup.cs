@@ -28,28 +28,11 @@ namespace Donovan.Game.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Configure identity services.
-            services.AddDefaultIdentity<IdentityUser>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = true;
-                options.User.RequireUniqueEmail = true;
-            })
-            .AddAzureTableStores<IdentityDataContext>(new Func<IdentityConfiguration>(() =>
-            {
-                var config = new IdentityConfiguration
-                {
-                    TablePrefix = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:TablePrefix").Value,
-                    StorageConnectionString = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:StorageConnectionString").Value,
-                    LocationMode = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:LocationMode").Value,
-                    IndexTableName = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:IndexTableName").Value,
-                    RoleTableName = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:RoleTableName").Value,
-                    UserTableName = Configuration.GetSection("IdentityAzureTable:IdentityConfiguration:UserTableName").Value
-                };
-
-                return config;
-            }))
-            .AddDefaultTokenProviders()
-            .CreateAzureTablesIfNotExists<IdentityDataContext>();
+            // Configure identity support.
+            services.AddDefaultIdentity<IdentityUser>(options => { options.SignIn.RequireConfirmedAccount = true; options.User.RequireUniqueEmail = true; })
+                .AddAzureTableStores<IdentityDataContext>(new Func<IdentityConfiguration>(() => { return this.GetIdentityConfiguration(); }))
+                .AddDefaultTokenProviders()
+                .CreateAzureTablesIfNotExists<IdentityDataContext>();
 
             // Configure Razor support.
             services.AddRazorPages();
@@ -82,6 +65,21 @@ namespace Donovan.Game.Web
             {
                 endpoints.MapRazorPages();
             });
+        }
+
+        private IdentityConfiguration GetIdentityConfiguration()
+        {
+            var config = new IdentityConfiguration
+            {
+                TablePrefix = Configuration["IdentityAzureTable:IdentityConfiguration:TablePrefix"],
+                StorageConnectionString = Configuration["IdentityAzureTable:IdentityConfiguration:StorageConnectionString"],
+                LocationMode = Configuration["IdentityAzureTable:IdentityConfiguration:LocationMode"],
+                IndexTableName = Configuration["IdentityAzureTable:IdentityConfiguration:IndexTableName"],
+                RoleTableName = Configuration["IdentityAzureTable:IdentityConfiguration:RoleTableName"],
+                UserTableName = Configuration["IdentityAzureTable:IdentityConfiguration:UserTableName"]
+            };
+
+            return config;
         }
     }
 }
