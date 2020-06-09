@@ -59,6 +59,21 @@ stages:
         targetPath: '$(Build.SourcesDirectory)/src/Donovan.Game.Web/bin/$(Solution.Configuration)/netcoreapp3.1/publish.zip'
         artifactName: '$(Artifact.WebSite)'
 
+    - task: DotNetCoreCLI@2
+      displayName: 'Package Tests'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: '**/Donovan.Game.Tests.csproj'
+        arguments: '--configuration $(Solution.Configuration) --no-build'
+        zipAfterPublish: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Tests'
+      inputs:
+        targetPath: '$(Build.SourcesDirectory)/src/Donovan.Game.Tests/bin/$(Solution.Configuration)/netcoreapp3.1/publish.zip'
+        artifactName: '$(Artifact.Tests)'
+
     - task: PublishPipelineArtifact@1
       displayName: 'Publish ARM Templates'
       inputs:
@@ -156,3 +171,26 @@ stages:
                     "slotSetting": false
                   }
                 ]
+
+          # Unpack Tests
+          - task: ExtractFiles@1
+            displayName: 'Unpack Tests'
+            inputs:
+              archiveFilePatterns: '$(Pipeline.Workspace)/$(Artifact.Tests)/publish.zip'
+              destinationFolder: '$(Pipeline.Workspace)/$(Artifact.Tests)/Donovan.Game.Tests'
+
+          # Configure Tests
+          - task: FileTransform@2
+            displayName: 'Configure Tests'
+            inputs:
+              folderPath: '$(Pipeline.Workspace)/$(Artifact.Tests)'
+              fileType: 'json'
+              jsonTargetFiles: '**/appsettings.json'
+              xmlTransformationRules: ''
+
+          # Run Tests
+          - task: VSTest@2
+            displayName: 'Run Tests'
+            inputs:
+              testSelector: 'testAssemblies'
+              testAssemblyVer2: '$(Pipeline.Workspace)/$(Artifact.Tests)/**/Donovan.Game.Tests.dll'

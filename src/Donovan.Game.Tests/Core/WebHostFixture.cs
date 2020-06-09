@@ -23,7 +23,7 @@ namespace Donovan.Game.Tests.Core
             // Configure the web host.
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile("appsettings.Development.json")
+                .AddJsonFile("appsettings.Development.json", true)
                 .Build();
 
             var builder = new HostBuilder()

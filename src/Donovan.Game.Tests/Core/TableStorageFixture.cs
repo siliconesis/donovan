@@ -18,7 +18,7 @@ namespace Donovan.Game.Tests.Core
         {
             this.Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile("appsettings.Development.json")
+                .AddJsonFile("appsettings.Development.json", true)
                 .Build();
 
             this.ConnectionString = this.Configuration["Tests:StorageConnectionString"];
