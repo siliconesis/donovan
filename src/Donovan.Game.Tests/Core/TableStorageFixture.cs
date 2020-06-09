@@ -52,32 +52,6 @@ namespace Donovan.Game.Tests.Core
             }
         }
 
-        private void CreateClients()
-        {
-            // Connect to storage.
-            var account = CloudStorageAccount.Parse(this.ConnectionString);
-            var tableClient = account.CreateCloudTableClient();
-
-            var table = tableClient.GetTableReference("Client");
-            table.Create();
-
-            // Create clients.
-            var clients = new List<Donovan.Game.Security.Client>()
-            {
-                new Donovan.Game.Security.Client() { Id = "donovan_tests",          Name = "Donovan Tests",            Secret = PasswordHelper.HashPassword("QJIE3ZQeY1f10K146DA7IkpWy4bMXnUG"), IsEnabled = true },
-                new Donovan.Game.Security.Client() { Id = "donovan_tests_disabled", Name = "Donovan Tests (Disabled)", Secret = PasswordHelper.HashPassword("ZUq6k7DG86Z6usIjMOZ0xY8hnTZGiAKg"), IsEnabled = false }
-            };
-
-            foreach (var client in clients)
-            {
-                // Create client.
-                var entity = new ClientEntity(client);
-                var operation = TableOperation.Insert(entity);
-
-                var result = table.Execute(operation);
-            }
-        }
-
         private void CreateManagers()
         {
             // Connect to storage.
@@ -160,7 +134,6 @@ namespace Donovan.Game.Tests.Core
             DeleteTables();
 
             CreateConfiguration();
-            CreateClients();
             CreateManagers();
         }
     }

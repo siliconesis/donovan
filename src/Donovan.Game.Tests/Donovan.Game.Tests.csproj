@@ -21,7 +21,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Legacy\ClientsApiTests.cs" />
     <Compile Remove="Legacy\ManagersApiTests.cs" />
     <Compile Remove="Legacy\ManagersClientTests.cs" />
   </ItemGroup>
@@ -43,7 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Legacy\ClientsApiTests.cs" />
     <None Include="Legacy\ManagersApiTests.cs" />
     <None Include="Legacy\ManagersClientTests.cs" />
   </ItemGroup>
