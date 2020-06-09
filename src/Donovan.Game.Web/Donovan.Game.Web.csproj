@@ -5,7 +5,6 @@
     <AssemblyName>Donovan.Game.Web</AssemblyName>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
-    <UserSecretsId>e0b915be-5645-4eed-8b2e-b47c2999ab2e</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
