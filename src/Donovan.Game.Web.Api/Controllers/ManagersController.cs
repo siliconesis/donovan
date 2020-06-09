@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Donovan.Game;
-using Donovan.Server.Services;
+using Donovan.Game.Services;
 using Donovan.Utilities;
 
-namespace Donovan.Server.Web.Api.Controllers
+namespace Donovan.Game.Web.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Donovan.Server.Web.Api
+namespace Donovan.Game.Web.Api
 {
     public class Program
     {

@@ -7,11 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Donovan.Server.Repositories;
-using Donovan.Server.Services;
-using Donovan.Server.Storage;
+using Donovan.Game.Repositories;
+using Donovan.Game.Services;
+using Donovan.Game.Storage;
 
-namespace Donovan.Server.Web.Api
+namespace Donovan.Game.Web.Api
 {
     public class Startup
     {
@@ -62,8 +62,6 @@ namespace Donovan.Server.Web.Api
 
             // Register application services.
             services.AddTransient<IConfigurationRepository, ConfigurationRepository>();
-            services.AddTransient<IClientService, ClientService>();
-            services.AddTransient<IClientRepository, ClientRepository>();
             services.AddTransient<IManagerService, ManagerService>();
             services.AddTransient<IManagerRepository, ManagerRepository>();
 

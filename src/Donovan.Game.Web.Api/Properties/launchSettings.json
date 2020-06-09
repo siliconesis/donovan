@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Donovan.Server.Web.Api": {
+    "Donovan.Game.Web.Api": {
       "commandName": "Project",
       "launchBrowser": false,
       "environmentVariables": {
