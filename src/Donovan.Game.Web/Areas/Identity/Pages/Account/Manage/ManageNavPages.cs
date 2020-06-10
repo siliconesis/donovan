@@ -20,17 +20,53 @@ namespace Donovan.Game.Web.Areas.Identity.Pages.Account.Manage
 
         public static string TwoFactorAuthentication => "TwoFactorAuthentication";
 
-        public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+        public static string IndexNavClass(ViewContext viewContext)
+        {
+            if (viewContext == null)
+                throw new ArgumentNullException(nameof(viewContext));
 
-        public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);
+            return PageNavClass(viewContext, Index);
+        }
 
-        public static string ChangePasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, ChangePassword);
+        public static string EmailNavClass(ViewContext viewContext)
+        {
+            if (viewContext == null)
+                throw new ArgumentNullException(nameof(viewContext));
 
-        public static string ExternalLoginsNavClass(ViewContext viewContext) => PageNavClass(viewContext, ExternalLogins);
+            return PageNavClass(viewContext, Email);
+        }
 
-        public static string PersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, PersonalData);
+        public static string ChangePasswordNavClass(ViewContext viewContext)
+        {
+            if (viewContext == null)
+                throw new ArgumentNullException(nameof(viewContext));
 
-        public static string TwoFactorAuthenticationNavClass(ViewContext viewContext) => PageNavClass(viewContext, TwoFactorAuthentication);
+            return PageNavClass(viewContext, ChangePassword);
+        }
+
+        public static string ExternalLoginsNavClass(ViewContext viewContext)
+        {
+            if (viewContext == null)
+                throw new ArgumentNullException(nameof(viewContext));
+
+            return PageNavClass(viewContext, ExternalLogins);
+        }
+
+        public static string PersonalDataNavClass(ViewContext viewContext)
+        {
+            if (viewContext == null)
+                throw new ArgumentNullException(nameof(viewContext));
+
+            return PageNavClass(viewContext, PersonalData);
+        }
+
+        public static string TwoFactorAuthenticationNavClass(ViewContext viewContext)
+        {
+            if (viewContext == null)
+                throw new ArgumentNullException(nameof(viewContext));
+
+            return PageNavClass(viewContext, TwoFactorAuthentication);
+        }
 
         private static string PageNavClass(ViewContext viewContext, string page)
         {

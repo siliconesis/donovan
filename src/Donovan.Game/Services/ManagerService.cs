@@ -15,8 +15,11 @@ namespace Donovan.Game.Services
 
         public ManagerService(IConfigurationRepository configurationRepository, IManagerRepository managerRepository)
         {
-            this.configurationRepository = configurationRepository;
-            this.managerRepository = managerRepository;
+            this.configurationRepository = configurationRepository ??
+                throw new ArgumentNullException(nameof(configurationRepository));
+
+            this.managerRepository = managerRepository ??
+                throw new ArgumentNullException(nameof(managerRepository));
 
             this.TokenSigningKey = this.configurationRepository.GetSettingAsync("Token", "SigningKey")
                 .Result
@@ -33,6 +36,9 @@ namespace Donovan.Game.Services
 
         public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             var manager = new Manager()
             {
                 Id = Guid.NewGuid(),
@@ -60,6 +66,9 @@ namespace Donovan.Game.Services
 
         public async Task<SigninResponse> SignInAsync(SigninRequest request)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             var response = null as SigninResponse;
 
             var manager = await this.managerRepository.GetManagerAsync(request.Email)
