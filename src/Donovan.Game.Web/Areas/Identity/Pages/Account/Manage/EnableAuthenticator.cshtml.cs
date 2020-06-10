@@ -83,7 +83,7 @@ namespace Donovan.Game.Web.Areas.Identity.Pages.Account.Manage
             }
 
             // Strip spaces and hypens
-            var verificationCode = Input.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+            var verificationCode = Input.Code.Replace(" ", string.Empty, StringComparison.CurrentCulture).Replace("-", string.Empty, StringComparison.CurrentCulture);
 
             var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
                 user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
