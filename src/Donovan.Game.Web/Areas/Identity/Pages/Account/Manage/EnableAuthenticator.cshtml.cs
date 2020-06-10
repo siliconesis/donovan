@@ -143,7 +143,7 @@ namespace Donovan.Game.Web.Areas.Identity.Pages.Account.Manage
                 result.Append(unformattedKey.Substring(currentPosition));
             }
 
-            return result.ToString().ToLowerInvariant();
+            return result.ToString().ToUpperInvariant();
         }
 
         private string GenerateQrCodeUri(string email, string unformattedKey)
